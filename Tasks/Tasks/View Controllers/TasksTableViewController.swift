@@ -7,15 +7,31 @@
 //
 
 import UIKit
+import CoreData
 
 class TasksTableViewController: UITableViewController {
 
     // MARK: - Properties
     
+    // NOTE! This is not a good, efficient wat to do this, as the fetch requet will be executed everytime the task property is accessed. We will learn a better way to do this later.
     
-    // MARK: - IBOutlets
-    
-    
+    var tasks: [Task] {
+        
+        // Fetch Request to fetch task specifically
+        let fetchRequest: NSFetchRequest<Task> = Task.fetchRequest()
+        
+        // Context you want to fetch the omdel objects to
+        let context = CoreDataStack.shared.mainContext
+        
+        do {
+            let fetchedTask = try context.fetch(fetchRequest)
+            return fetchedTask
+        } catch {
+            NSLog("Error fetching tasks: \(error)")
+            return []
+        }
+    }
+
     // MARK: - View Lifecycle
 
     
@@ -26,24 +42,33 @@ class TasksTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath) as! TaskTableViewCell else { return UITableViewCell }
 
-        // Configure the cell...
+        cell.
 
         return cell
     }
 
-    /*
+    
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            // Delete the row from the data source
+            
+            let task = tasks[indexPath.row]
+            let context = CoreDataStack.shared.mainContext
+            
+            context.delete(task)
+            
+            do {
+                try context.save()
+            } catch {
+                NSLog("Error saving context after deleting Task: \(error)")
+                context.reset()
+            }
+            
             tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+        }
     }
-    */
 
     // MARK: - Navigation
 
