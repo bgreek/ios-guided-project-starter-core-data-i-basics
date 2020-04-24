@@ -9,19 +9,20 @@
 import UIKit
 
 class CreateTaskViewController: UIViewController {
-
+    
     // MARK: - Properties
     var complete = false
     
     // MARK: - IBOutlets
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var notesTextView: UITextView!
+    @IBOutlet weak var priorityControl: UISegmentedControl!
     
     // MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
     }
-        
+    
     // MARK: - IBActions
     @IBAction func save(_ sender: Any) {
         
@@ -31,9 +32,13 @@ class CreateTaskViewController: UIViewController {
         
         let notes = notesTextView.text
         
+        let selctedPriority = priorityControl.selectedSegmentIndex
+        let priority = TaskPriority.allCases[selctedPriority]
+        
         Task(name: name,
              notes: notes,
              complete: complete,
+             priority: priority,
              context: CoreDataStack.shared.mainContext)
         
         do {
